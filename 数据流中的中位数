@@ -1,0 +1,113 @@
+面试题41 python3
+
+个人解法 
+addNum:
+   保持数组单调增，在插入元素时二分，o(logn) + o(n)
+findMedian:
+   根据数组长度奇偶性返回中位数
+没有注意的几点：
+   python3 /2 小数除  //2 取整  >>1 右移还是整数
+   二分时，left=0,right=len-1, while(left<=right) ... insert(left,num) 边界条件等号忘了   
+class MedianFinder:
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.Num = []
+    def addNum(self, num: int) -> None:
+        if len(self.Num)== 0 or self.Num[-1] < num:
+            self.Num.append(num)
+        else:
+            j = len(self.Num)-1
+            i = 0
+            while (i <= j):
+                # 0,1,2,3 -> 1
+                # 0,1,2   -> 1
+                mid = (i + j)>>1
+                if self.Num[mid]== num:
+                    self.Num.insert(mid,num)
+                    return 
+                else:
+                    if self.Num[mid] < num:
+                        i = mid+1
+                    else:
+                        j = mid - 1
+            self.Num.insert(i,num)                 
+    def findMedian(self) -> float:
+        l = len(self.Num)
+        if l == 0:
+            return 
+        if l%2 == 0:
+            return (self.Num[l>>1] + self.Num[(l>>1)-1])/2
+        return self.Num[l>>1]    
+
+
+
+# Your MedianFinder object will be instantiated and called as such:
+# obj = MedianFinder()
+# obj.addNum(num)
+# param_2 = obj.findMedian()
+
+-----------------------------------------
+比较优的思路O(logN)
+建立A小顶堆，B大顶堆
+A size=m, B size=n
+保证m >= n
+m=n时，插入元素使得m->m+1,先插入到B中，再将B顶弹出给A   [复杂度O(2logn+logm)](如果直接插入到A，且插入的元素应当是B的元素[logm+1]/[logm+1+logm+logn+logn+logm])
+m>n时，插入元素使得m=n,先插入A中，再将A顶弹出给B [复杂度O(logm+logm+logn)] (如果直接插入到B，且插入的元素应当是A的元素 [logn+1]/[logn+1+logn+logm+logm+logn])
+
+补充python heapq的语法
+heapq是小顶堆，实现大顶堆可以让压入的元素变为负数
+看过思路自己的代码，两种实现
+from heapq import *
+class MedianFinder:
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.A = []
+        self.B = []
+    def addNum(self, num: int) -> None:
+        m = len(self.A)
+        n = len(self.B)                 
+        if m == n:
+            x = heapq.heappushpop(self.B,-num)
+            heapq.heappush(self.A,-x)
+            
+            # heapq.heappush(self.A,num)
+            # if self.B==[]:
+            #     return  
+            # xa,xb = self.A[0],self.B[0]
+            # if xa < -xb:
+            #     heapq.heappush(self.A,-heapq.heappop(self.B))
+            #     heapq.heappush(self.B,-heapq.heappop(self.A))
+
+        else:
+            x = heapq.heappushpop(self.A,num)
+            heapq.heappush(self.B,-x)
+
+            # heapq.heappush(self.B,-num)
+            # xa,xb = self.A[0],self.B[0]
+            # if xa < -xb:
+            #     heapq.heappush(self.B,-heapq.heappop(self.A))
+            #     heapq.heappush(self.A,-heapq.heappop(self.B))
+ 
+    def findMedian(self) -> float:
+        m = len(self.A)
+        n = len(self.B)
+        return  self.A[0] if m > n else (self.A[0]-self.B[0])/2   
+
+
+
+
+# Your MedianFinder object will be instantiated and called as such:
+# obj = MedianFinder()
+# obj.addNum(num)
+# param_2 = obj.findMedian()
+
+教训：注意在取元素，弹元素，很有可能容器是空的，这次在自己注释掉的那部分代码中，出现了B==[],还是取B[0]的问题
+      heapq.heappush 别忘了heap,写成了heap.push 
+别人家的代码
+差不多一样，其实是我先浏览了别人的代码，嘻嘻。
