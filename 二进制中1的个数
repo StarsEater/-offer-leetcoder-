@@ -1,0 +1,19 @@
+记录一下三种方法
+思路1：
+def hammingWeight(self,n:int)->int:
+    return bin(n).count('1')
+思路2：O(M) 这方法牛逼
+def hammingWeight(self,n:int)->int:
+    ans = 0
+    while(n!=0):
+       ans += 1
+       n &=(n-1) # 目的是将最右侧的1变为0
+    return ans   
+思路3：O(logn)
+def hammingWeight(self,n:int)->int:
+    ans = 0
+    while(n!=0):
+       ans += n&1
+       n >>=1
+    return ans 
+
