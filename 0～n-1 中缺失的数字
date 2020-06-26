@@ -1,0 +1,15 @@
+感觉自己的二分在边界处要想好久
+想清楚左右部分分别代表啥
+左边代表 nums[i]==i
+右边代表 nums[i]!=i
+跳出边界同时，左右两个i,j对应地跳到对方的阵地里，自身属性是彻底变化的。同时，明确ans出现在右边，就是i了
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        l,r = 0, len(nums)-1
+        while(l<=r):
+            mid = (l+r)//2
+            if mid == nums[mid]:
+               l = mid + 1
+            else:
+               r = mid - 1    
+        return l 
