@@ -8,3 +8,95 @@ bisect.bisect(data,7)  # 查找该数值将会插入的位置并返回，而不�
 bisect.bisect_left(data,5) # 处理将会插入重复数值 1
 bisect.insort_left(data,5) # 同
 -----待续，写ppt了
+树状数组
+update(e,v)更新当前节点，更新只需要向后更新管辖住自己的节点
+query(e)查询当前节点的前面的每个统计量的总和，只需要用自己的管辖范围的数字加上前一个管辖范围的数字（总之就是递推直至为0）
+lowbit x&(-x)
+
+0000 - 0001                   0-1
+0000 - 0010 - 0011            0-2-3 
+0000 - 0100 - 0101            0-4-5
+0000 - 0100 - 0110 - 0111     0-4-6-7
+0000 - 1000 - 1010            0-8-10
+0000 - 1000 - 1001            0-8-9
+
+class BIT:
+    def __init__(self,n):
+        self.n = n
+        self.data = [0]*(n+1)
+    
+    @staticmethod
+    def lowBit(x):
+        return x&(-x)
+
+    def update(self,x):
+        while(x<=self.n):
+            self.data[x] += 1
+            x += BIT.lowBit(x)
+
+    def query(self,x):
+        ans = 0
+        while(x>0):
+            ans += self.data[x]
+            x -= BIT.lowBit(x)
+        return ans
+class Solution:
+    def reversePairs(self, nums: List[int]) -> int:
+        #离散化，数组范围跨度可能较大，将离散的数据映射到连续的范围内，结果一样
+        import bisect
+        n = len(nums)
+        bit = BIT(n)
+        sorted_nums = sorted(nums)
+        for i in range(n):
+            nums[i] = bisect.bisect_left(sorted_nums,nums[i])+1
+        ans = 0
+        for i in range(n-1,-1,-1):
+            bit.update(nums[i])
+            ans += bit.query(nums[i]-1)
+        return  ans    
+PS:for range(j) j 发生变化，不会影响循环次数
+------------------
+更简单，当前数的逆序数，如果前面已经有序的情况下，只要知道插入位置，就可以迅速知道逆序数的=位置(更确切的是index-1,不过都是从0开始的)
+class Solution:
+    def reversePairs(self, nums: List[int]) -> int:
+        #离散化，数组范围跨度可能较大，将离散的数据映射到连续的范围内，结果一样
+        import bisect
+        binary,ans= [],0
+        for i in nums:
+            index = bisect.bisect_left(binary,-i)
+            ans += index
+            binary[index:index]=[-i]
+        return  ans    
+-------------------------------
+归并排序还是很秒的，归并两个步骤先划分，划分到不能划分，就开始合并两个有序数组，本题的用处就在于合并的时候可以计算逆序数
+class Solution:
+    def reversePairs(self, nums: List[int]) -> int:
+        # 归并
+        return self.MergeSort(nums)
+    def MergeSort(self,nums:List[int])->int:
+        L = len(nums)//2
+        if L < 1:
+            return 0
+        left_nums,right_nums = nums[:L],nums[L:] 
+        i,j,k,ans = 0,0,0,self.MergeSort(left_nums)+self.MergeSort(right_nums)
+        # print(left_nums,right_nums)
+        left_lens,right_lens = len(left_nums),len(right_nums) 
+        while(i < left_lens and j < right_lens):
+            if left_nums[i] <= right_nums[j]:
+                nums[k] = left_nums[i]
+                k,i = k+1,i+1
+            else:
+                nums[k] = right_nums[j]
+                ans,k,j = ans+left_lens-i,k+1,j+1
+                # print(left_lens,i)
+        while(i < left_lens):
+            nums[k] = left_nums[i]
+            k,i= k+1,i+1
+        while(j < right_lens):
+            nums[k] = right_nums[j]
+            k,j = k+1,j+1        
+        return ans                        
+PS：数组整体直接赋值为另一个数组，不会改变原来的数组
+
+
+
