@@ -1,0 +1,34 @@
+好累，又要刷题又要ppt又要应付实验室，烦
+思路
+字符串为s
+正则表达式为p
+
+s[:i+1] 和 p[:j+1]匹配的情况分为3种
+a. s[i]==p[j] 都是字母且相等
+b. p[j] 不用管反正任意字母
+c. p[j]='*'
+   1、匹配s[:i+1] 0个字符，p[j]和p[j-1]统统扔掉，剩余的部分即p[:j-1]和s[i]匹配
+   2、匹配s[:i+1]多个字符，先匹配一个试试 p[:j+1]不变，s[i]扔掉(前提很重要!!!!!!!!!!!!!!!!!s[i]==p[j-1]或者p[j-1]=='.')，比较s[:i] 和 p[:j+1]
+边界条件
+   1、空字符串和空正则 true
+   2、空字符串和非空正则 dp比较
+   3、非空字符串和空正则 false
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        # 行串，列正则
+        m,n = len(s)+1,len(p)+1
+        dp = [[False]*n for i in range(m)]
+        dp[0][0]=True
+        for j in range(1,n):
+            dp[0][j] = p[j-1]=='*' and (dp[0][j-1] or j >1 and dp[0][j-2])   
+        for i in range(1,m):
+            for j in range(1,n):
+                dp[i][j] = \
+            p[j-1]=='*' and  \
+            j > 1 and (dp[i][j-2] or dp[i-1][j]  and ( s[i-1]==p[j-2] or p[j-2]=='.') )\
+        or  p[j-1]=='.' and dp[i-1][j-1] \
+        or  p[j-1]==s[i-1] and dp[i-1][j-1]    
+        return dp[-1][-1]    
+ -----------------------
+ 边界条件没有注意爱，另外总是没有写完代码检查的习惯，下一次要逼自己了嘿嘿嘿
+   
