@@ -17,4 +17,4 @@ class Solution:
                     return True
         return False   
 思路dfs
-上来直接判断边界，越界，或者不匹配或者word到了len-1，之后迭代的判断就简洁多了。
+上来直接判断边界，越界，或者不匹配或者word到了len-1，之后迭代的判断就简洁多了。还有复用原数组咋没想到
